@@ -2,6 +2,11 @@ package aed;
 
 import java.util.Comparator;
 
+public class Ciudad {
+    private int id;
+    private int gananciaTotal;
+    private int perdidaTotal;
+    private int heapIndex = -1;
     public class Ciudad {
         private int id;
         private int gananciaTotal;
@@ -13,11 +18,12 @@ import java.util.Comparator;
             this.perdidaTotal = 0;
         }
 
-        public int getId() { return id; }
-        public int getGananciaTotal() { return gananciaTotal; }
-        public int getPerdidaTotal() { return perdidaTotal; }
-        public int getSuperavit() { return gananciaTotal - perdidaTotal; }
-
+    public int getId() { return id; }
+    public int getGananciaTotal() { return gananciaTotal; }
+    public int getPerdidaTotal() { return perdidaTotal; }
+    public int getSuperavit() { return gananciaTotal - perdidaTotal; }
+    public int getHeapIndex() { return heapIndex; }
+    public void setHeapIndex(int index) { this.heapIndex = index; }
 
         public void agregarPerdida(int perdida) {
             this.perdidaTotal += perdida;
