@@ -15,6 +15,8 @@ public class BestEffort {
     private ArrayList<Integer> ciudadesMaxGanancia;
     private ArrayList<Integer> ciudadesMaxPerdida;
 
+    //En el constructor del heap debemos hacer el heapify ,De ahi sale O(T) cuando iniciamos el sistemaBesteffort
+    //Registrar Tralados ahi es tranqui, solo loopemos en la lista de traslados y agregamos al heap con siftup 
     public BestEffort(int cantCiudades, Traslado[] traslados){
         this.heapRedituable = new Heap<>(Traslado.byGananciaRedituable()); // O(1)
         this.heapAntiguo = new Heap<>(Traslado.byAntiguedad()); // O(1)
