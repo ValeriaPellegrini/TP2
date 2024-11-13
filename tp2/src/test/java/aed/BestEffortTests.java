@@ -42,6 +42,88 @@ public class BestEffortTests {
     }
 
     @Test
+    void testearHeap(){
+        Heap<Traslado> heap = new Heap<>(listaTraslados,new RedituableComparator());
+        Heap<Traslado> heap2= new Heap<>(listaTraslados,new TimestampComparator());
+
+        // heapify.array2heap(listaTraslados);
+
+        //Chequeo si el constructor hace  bien el heapify
+        // assertEquals("[2000,500,1000,100,500,400,1000]", aString(heap,false));
+        assertEquals("[2000,1000,1000,500,400,100,500]", aString(heap,false));
+        assertEquals("[10,11,41,20,40,50,42]",aString(heap2, true));
+
+      //   assertEquals(listaTraslados[6].gananciaNeta, heap.sacarMaximo().gananciaNeta);
+      //   assertEquals(listaTraslados[4], heap.maximo().gananciaNeta);
+        
+        // El heap se deberia ver asi
+        //Heapify y agregar nos dan diferentes heaps , pero siguen cumpliendo el invariante
+        
+
+        assertEquals(listaTraslados[6].getGananciaNeta(), heap.peekRoot().getGananciaNeta());// Cheque si funciona bien el heap
+        Traslado aux = heap.extractRoot();
+
+        // assertEquals(true, mantieneInvarianteHeap(heap));
+        assertEquals(6, heap.size());
+    
+        assertEquals(listaTraslados[6], aux); //Reviso si devuelve bien extractroot()
+        assertEquals(listaTraslados[4].getId(), heap.peekRoot().getId()); // Revisamos el caso donde ganancias iguales, y el id menor tiene que ser el que este en la cabeza
+        assertEquals(listaTraslados[0].getTimestamp(), heap2.peekRoot().getTimestamp());// chequeo si funciona bien con comparador time
+
+    }
+    //arraytoheap funciona, insercion , eliminarMax funciona
+
+    @Test
+    void testearEliminar(){
+        Heap<Traslado> heap = new Heap<>(listaTraslados,new RedituableComparator());
+        Heap<Traslado> heap2 = new Heap<>(listaTraslados,new TimestampComparator());
+        // heap.array2heap(listaTraslados);
+        // heap2.array2heap(listaTraslados);
+
+        assertEquals("[2000,1000,1000,500,400,100,500]", aString(heap,false));
+        assertEquals("heap", aString(heap2,true));
+
+
+    }
+    //Si dudas de que algun heap, creado no cumple propiedades de heap usa esto, asi te ahorras de usar el aString
+    // public Boolean mantieneInvarianteHeap(Heap<Traslado> heap){
+    //     Boolean res = false;
+    //     int i =0;
+    //     while (i <heap.size() && (getHijoDer(i) < heap.size() && getHijoDer(i) < heap.size())) {
+    //         Traslado padre = heap.heap.get(i);
+    //         if(padre.getGananciaNeta() < getHijoDer(i) && padre.getGananciaNeta() < getHijoIzq(i)){
+    //             res = false;
+    //         }else{
+    //             res = true;
+    //         }
+    //         i++;
+    //     }
+    //     return res;
+    // }
+    public int getHijoIzq(int i){
+        return 2*i+1;
+    }
+    public int getHijoDer(int i){
+        return 2*i+2;
+    }
+    public String aString(Heap<Traslado> heap, boolean esTimeStamp){
+        if(esTimeStamp){
+            String str = "[" + heap.listaxd().get(0).getTimestamp();
+            for(int i =1; i<=heap.listaxd().size()-1; i++){
+                str = str +","+ heap.listaxd().get(i).getTimestamp();
+            }
+            str = str +"]";
+            return str;
+        }
+        String str = "[" + heap.listaxd().get(0).getGananciaNeta();
+        for(int i =1; i<=heap.listaxd().size()-1; i++){
+            str = str +","+ heap.listaxd().get(i).getGananciaNeta();
+        }
+        str = str +"]";
+        return str;
+    }
+
+    @Test
     void despachar_con_mas_ganancia_de_a_uno(){
         BestEffort sis = new BestEffort(this.cantCiudades, this.listaTraslados);
 

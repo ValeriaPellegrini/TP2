@@ -18,12 +18,11 @@ public class BestEffort {
     //En el constructor del heap debemos hacer el heapify ,De ahi sale O(T) cuando iniciamos el sistemaBesteffort
     //Registrar Tralados ahi es tranqui, solo loopemos en la lista de traslados y agregamos al heap con siftup 
     public BestEffort(int cantCiudades, Traslado[] traslados){
-        this.heapRedituable = new Heap<>(Traslado.byGananciaRedituable()); // O(1)
-        this.heapAntiguo = new Heap<>(Traslado.byAntiguedad()); // O(1)
+        this.heapRedituable = new Heap<>(traslados,new RedituableComparator()); // O(1)
+        this.heapAntiguo = new Heap<>(traslados,new TimestampComparator()); // O(1)
         this.gananciaTotal = 0; // O(1)
         this.trasladosDespachados = 0; // O(1)
         this.ciudades = new Ciudad[cantCiudades]; // O(C)
-        this.ciudadConMayorSuperavit = new Heap<>(Ciudad.byMayorSuperavit()); // O(1)
         this.maxGanancia = 0; // O(1)
         this.maxPerdida = 0; // O(1)
         this.ciudadesMaxGanancia = new ArrayList<>(); // O(1)
@@ -33,8 +32,10 @@ public class BestEffort {
             ciudades[i] = new Ciudad(i);
         } // O(C)
 
+        this.ciudadConMayorSuperavit = new Heap<>(ciudades,Ciudad.byMayorSuperavit()); // O(1)
+
         // Registrar traslados iniciales
-        registrarTraslados(traslados); // O(T)
+        // registrarTraslados(traslados); // O(T)
     } // Complejidad Temporal total ~ O(C)+O(T)
     
 

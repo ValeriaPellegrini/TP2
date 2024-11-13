@@ -10,11 +10,16 @@ public class Heap<T> {
     private ArrayList<T> heap;
     private Comparator<T> comparator;
 
-    public Heap(Comparator<T> comparator) {
+    public Heap(T[] inicioDeSist, Comparator<T> comparator) {
         //Hacer el heapify
         this.heap = new ArrayList<>();
         this.comparator = comparator;
-    }
+        for (int i=0; i<inicioDeSist.length;i++){
+            heap.add(inicioDeSist[i]);
+        }
+        array2heap();   
+
+}
 
     public void insert(T element) {
         //Añade elemento al final y luego sube, si corresponde
@@ -48,16 +53,14 @@ public class Heap<T> {
     }
     // Algoritmo de floyd, heapify, O(n)
     // Para cada elem de la lista 
-    public void array2heap(T[] elems){
-        for (T e: elems){ // O(n)
-            heap.add(e);
-        }
-        for(int i = size()-1 ; i >=0 ; i-- ){
+    public void array2heap(){
+
+        for(int i = size()-1 ; i >=0 ; i-- ){ //O(n) por algoritmo de floyd
             heapifyDown(i);
         }
     }
     private void heapifyUp(int index) {
-        // Hijo_izq: 2*id_padre + 1
+        // Hijo_izq: 2*id_padre + 1-
         // Hijo_der: 2*in_padre + 2
         int parentIndex = (index - 1) / 2; //toma siempre parte entera
         // En un COMPARADOR, si el valor es NEGATIVO, estamos cumpliendo el orden.
