@@ -1,16 +1,25 @@
 package aed;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Comparator;
+//Modificar el cosntructor de heap, Reciba parametros , lista de traslados
 
+import javax.print.DocFlavor.STRING;
 public class Heap<T> {
     private ArrayList<T> heap;
     private Comparator<T> comparator;
 
-    public Heap(Comparator<T> comparator) {
+    public Heap(T[] inicioDeSist, Comparator<T> comparator) {
+        //Hacer el heapify
         this.heap = new ArrayList<>();
         this.comparator = comparator;
-    }
+        for (int i=0; i<inicioDeSist.length;i++){
+            heap.add(inicioDeSist[i]);
+        }
+        array2heap();   
+
+}
 
     public void insert(T element) {
         //Añade elemento al final y luego sube, si corresponde
@@ -42,9 +51,16 @@ public class Heap<T> {
     public boolean isEmpty() {
         return heap.isEmpty(); // verifica si está vacío
     }
+    // Algoritmo de floyd, heapify, O(n)
+    // Para cada elem de la lista 
+    public void array2heap(){
 
+        for(int i = size()-1 ; i >=0 ; i-- ){ //O(n) por algoritmo de floyd
+            heapifyDown(i);
+        }
+    }
     private void heapifyUp(int index) {
-        // Hijo_izq: 2*id_padre + 1
+        // Hijo_izq: 2*id_padre + 1-
         // Hijo_der: 2*in_padre + 2
         int parentIndex = (index - 1) / 2; //toma siempre parte entera
         // En un COMPARADOR, si el valor es NEGATIVO, estamos cumpliendo el orden.
@@ -127,5 +143,15 @@ public class Heap<T> {
         // Restauramos la propiedad del heap con heapifyDown o heapifyUp desde el índice afectado
         heapifyDown(index);  // O(LOG N)
         heapifyUp(index);    // O(LOG N)
+    }
+    
+    public ArrayList<T> listaxd(){
+        ArrayList<T> str = new ArrayList<>();
+
+        for (int i = 0;i<=heap.size()-1;i++){
+            
+            str.add(heap.get(i));  
+        }
+        return str;
     }    
 }

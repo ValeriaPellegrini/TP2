@@ -51,4 +51,3 @@ public class Traslado {
         return id == traslado.id;  // 'id' es único para cada Traslado
     }
 }
-
