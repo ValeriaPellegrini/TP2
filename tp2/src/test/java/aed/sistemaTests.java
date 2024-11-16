@@ -65,7 +65,7 @@ public class sistemaTests {
 
     @Test
     void stress(){
-        int cantCiudades = 1000;
+        int cantCiudades = 10000;
         int cantTraslados = 20000;
         Traslado[] traslados = new Traslado[cantTraslados];
         //Genero Tralados y los agrego al array
