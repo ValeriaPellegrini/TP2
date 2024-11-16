@@ -15,113 +15,113 @@ public class BestEffort {
     private ArrayList<Integer> ciudadesMaxGanancia;
     private ArrayList<Integer> ciudadesMaxPerdida;
 
-    //En el constructor del heap debemos hacer el heapify ,De ahi sale O(T) cuando iniciamos el sistemaBesteffort
-    //Registrar Tralados ahi es tranqui, solo loopemos en la lista de traslados y agregamos al heap con siftup 
     public BestEffort(int cantCiudades, Traslado[] traslados){
-        this.heapRedituable = new Heap<>(traslados,new RedituableComparator()); // O(1)
-        this.heapAntiguo = new Heap<>(traslados,new TimestampComparator()); // O(1)
+        this.heapRedituable = new Heap<>(traslados, Traslado.byGananciaRedituable(), true); // O(|T|)
+        this.heapAntiguo = new Heap<>(traslados, Traslado.byAntiguedad(), false); // O(|T|)
         this.gananciaTotal = 0; // O(1)
         this.trasladosDespachados = 0; // O(1)
-        this.ciudades = new Ciudad[cantCiudades]; // O(C)
+        this.ciudades = new Ciudad[cantCiudades]; // O(|C|)
         this.maxGanancia = 0; // O(1)
         this.maxPerdida = 0; // O(1)
-        this.ciudadesMaxGanancia = new ArrayList<>(); // O(1)
-        this.ciudadesMaxPerdida = new ArrayList<>(); // O(1)
+        this.ciudadesMaxGanancia = new ArrayList<>(cantCiudades); // O(1)
+        this.ciudadesMaxPerdida = new ArrayList<>(cantCiudades); // O(1)
 
-        for (int i = 0; i < cantCiudades; i++) {
-            ciudades[i] = new Ciudad(i);
-        } // O(C)
-
-        this.ciudadConMayorSuperavit = new Heap<>(ciudades,Ciudad.byMayorSuperavit()); // O(1)
-
-        // Registrar traslados iniciales
-        // registrarTraslados(traslados); // O(T)
-    } // Complejidad Temporal total ~ O(C)+O(T)
-    
+        for (int i = 0; i < cantCiudades; i++) { //O(|C|)
+            ciudades[i] = new Ciudad(i); //O(1)
+        } // O(|C|)
+        this.ciudadConMayorSuperavit = new Heap<>(ciudades, Ciudad.byMayorSuperavit(), true); // O(|C|)
+       
+    } //Complejidad Temporal total ~ O(|C| + |T|)
 
     public void registrarTraslados(Traslado[] traslados){
-        for (Traslado t : traslados) {
-            heapRedituable.insert(t); // O(LOG N)
-            heapAntiguo.insert(t); // O(LOG N) 
-        } 
-        // Complejidad Temporal total ~ O(T * LOG(N)), donde T es el número de traslados y N es el tamaño de los heaps.
+        
+        for (Traslado traslado : traslados) { //O(|T|)
+            
+            heapRedituable.agregar(traslado, true); // O(LOG |T|)
+            heapAntiguo.agregar(traslado, false); // (LOG |T|)
+            
+        } // Complejidad Temporal total ~ O(|T|(LOG |T|))
     }
     
     private void actualizarEstadisticas(Traslado traslado) {
         int ganancia = traslado.getGananciaNeta(); // O(1)
         Ciudad origen = ciudades[traslado.getOrigen()]; // O(1)
         Ciudad destino = ciudades[traslado.getDestino()]; // O(1)
+
+        //Sacamos origen y destino del heap de Superavit
+        ciudadConMayorSuperavit.sacar(origen); //O(LOG(|C|))
+        ciudadConMayorSuperavit.sacar(destino); //O(LOG(|C|))
     
         // Actualiza las ganancias y pérdidas
         origen.agregarGanancia(ganancia); // O(1)
         destino.agregarPerdida(ganancia); // O(1)
+
+        //Una vez actualizados los valores, agregamos origen y destino al heap de superavit
+        ciudadConMayorSuperavit.agregar(origen,true); //O(LOG(|C|))
+        ciudadConMayorSuperavit.agregar(destino,true); //O(LOG(|C|))
+    
     
         // Actualiza las ciudades con mayor ganancia
         int gananciaOrigen = origen.getGananciaTotal(); // O(1)
-        if (gananciaOrigen > maxGanancia) {
-            maxGanancia = gananciaOrigen;
-            ciudadesMaxGanancia.clear();
-            ciudadesMaxGanancia.add(origen.getId());
-        } else if (gananciaOrigen == maxGanancia) {
-            ciudadesMaxGanancia.add(origen.getId());
-        }
+        if (gananciaOrigen > maxGanancia) { // O(1)
+            maxGanancia = gananciaOrigen; // O(1)
+            ciudadesMaxGanancia.clear(); // O(1)
+            ciudadesMaxGanancia.add(origen.getId()); // O(1)
+        } else if (gananciaOrigen == maxGanancia) { // O(1)
+            ciudadesMaxGanancia.add(origen.getId()); // O(1)
+        } //O(1)
     
         // Actualiza las ciudades con mayor pérdida
         int perdidaDestino = destino.getPerdidaTotal(); // O(1)
-        if (perdidaDestino > maxPerdida) {
-            maxPerdida = perdidaDestino;
-            ciudadesMaxPerdida.clear();
-            ciudadesMaxPerdida.add(destino.getId());
-        } else if (perdidaDestino == maxPerdida) {
-            ciudadesMaxPerdida.add(destino.getId());
-        }
+        if (perdidaDestino > maxPerdida) { // O(1)
+            maxPerdida = perdidaDestino; // O(1)
+            ciudadesMaxPerdida.clear(); // O(1)
+            ciudadesMaxPerdida.add(destino.getId()); // O(1)
+        } else if (perdidaDestino == maxPerdida) { // O(1)
+            ciudadesMaxPerdida.add(destino.getId()); // O(1)
+        } //O(1)
     
         gananciaTotal += ganancia; // O(1)
         trasladosDespachados++; // O(1)
-    } // Complejidad Temporal total ~ O(1)
+    } // Complejidad Temporal total ~ //O(LOG(|C|))
 
     public ArrayList<Integer> despacharMasRedituables(int n) {
         ArrayList<Integer> idsDespachados = new ArrayList<>();
-        for (int i = 0; i < n && !heapRedituable.isEmpty(); i++) {
-            Traslado traslado = heapRedituable.extractRoot(); // O(LOG(T))
+        for (int i = 0; i < n && !heapRedituable.estaVacio(); i++) {
+            Traslado traslado = heapRedituable.raiz(); // O(LOG(T))
             idsDespachados.add(traslado.getId()); // O(1)
-            actualizarEstadisticas(traslado); // O(1)
+            actualizarEstadisticas(traslado); // //O(LOG(|C|))
+            heapRedituable.sacar(traslado, true); //O(LOG(T))
+           
             
-            // Sincronización: eliminar el traslado de heapAntiguo si existe
-            sincronizarHeapConOtro(traslado, heapAntiguo); // O(LOG(T))
+            // Sincronización: eliminar el traslado de heapAntiguo
+            heapAntiguo.sacar(traslado, false); // O(LOG(T))
+            
         } // O(N)
+       
         return idsDespachados;
-    } // Complejidad Temporal total ~ O(N*LOG(T))
+    } // Complejidad Temporal total ~ O(N*(LOG(|T|) + LOG(|C|)))
 
     public ArrayList<Integer> despacharMasAntiguos(int n){
         ArrayList<Integer> idsDespachados = new ArrayList<>();
-        for (int i = 0; i < n && !heapAntiguo.isEmpty(); i++) {
-            Traslado traslado = heapAntiguo.extractRoot(); // O(LOG(T))
+        for (int i = 0; i < n && !heapAntiguo.estaVacio(); i++) {
+            Traslado traslado = heapAntiguo.raiz(); // O(LOG(T))
             idsDespachados.add(traslado.getId());// O(1)
-            actualizarEstadisticas(traslado); // O(1)
+            actualizarEstadisticas(traslado); // //O(LOG(|C|))
+            heapAntiguo.sacar(traslado, false); // O(LOG(T))
 
             // Sincronización: eliminar el traslado de heapRedituable si existe
-            sincronizarHeapConOtro(traslado, heapRedituable); // O(LOG(T))
+            heapRedituable.sacar(traslado, true);; // O(LOG(T))
         } // O(N)
+       
         return idsDespachados;
-    } // Complejidad Temporal total ~ O(N*LOG(T))
-    
-    // Método para eliminar un traslado de un heap específico si existe
-    private void sincronizarHeapConOtro(Traslado traslado, Heap<Traslado> otroHeap) {
-        // Usamos equals para comparar si ambos heaps son iguales (si sobrescribes equals en Heap)
-        boolean isMaxHeap = otroHeap.equals(heapRedituable);  // Si es el heap máximo
-    
-        // Llamamos al método remove, indicando si es un heap máximo o mínimo
-        otroHeap.remove(traslado, isMaxHeap);  // Eliminar del heap correspondiente
-    }
-    
-    
+    } // Complejidad Temporal total ~ O(N*(LOG(|T|) + LOG(|C|)))
     
     public int ciudadConMayorSuperavit() {
-        if (ciudadConMayorSuperavit.isEmpty()) {return -1;}
+        if (ciudadConMayorSuperavit.estaVacio()) {return -1;}
         
         // Extraemos la ciudad con el mayor superávit
-        Ciudad ciudad = ciudadConMayorSuperavit.extractRoot(); // O(1)
+        Ciudad ciudad = ciudadConMayorSuperavit.raiz(); // O(1)
         return ciudad.getId(); // O(1)
     }
 
@@ -137,5 +137,7 @@ public class BestEffort {
     public int gananciaPromedioPorTraslado(){
         return gananciaTotal / trasladosDespachados;
     } // Complejidad Temporal total ~ O(1)
+
+  
     
 }
